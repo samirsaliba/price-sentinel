@@ -4,7 +4,6 @@ Found on https://github.com/stummjr/scrapy_price_monitor/
 """
 import os
 import scrapy
-import locale
 from datetime import datetime
 import yaml
 from yaml.loader import SafeLoader
@@ -27,7 +26,8 @@ class BaseSpider(scrapy.Spider):
             for url in product_info["urls"]:
                 if self.name in url:
                     now = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-                    item = {'product_name': product_info["name"],
+                    meta = {'product_name': product_info["name"],
                             'retailer': self.name, 
-                            'when': now}
-                    yield scrapy.Request(url, meta={'item': item})
+                            'when': now,
+                            'url': url}
+                    yield scrapy.Request(url, meta={'item-meta': meta})
