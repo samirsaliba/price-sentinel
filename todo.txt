@@ -1,0 +1,11 @@
+
+- Clean price strings
+	https://stackoverflow.com/questions/48843193/convert-a-number-using-atof
+
+- Add data transformations pipeline
+
+- Add business logic for checking price drops with different criteria
+
+- Add notifiers
+
+- Add Dockerfile, docker-compose
