@@ -5,28 +5,25 @@ Found on https://github.com/stummjr/scrapy_price_monitor/
 import os
 import scrapy
 from datetime import datetime
-import yaml
-from yaml.loader import SafeLoader
+import json
 
 
 # Open the file and load the file
-PRODUCTS_DIR = "resources"
-FILE_NAME = "products.yml"
+FILE_NAME = "products.json"
 
 class BaseSpider(scrapy.Spider):
     def start_requests(self):
-        ROOT_DIR = os.environ["PRICE_SENTINEL_ROOT_DIR"]
-        products_path = os.path.join(ROOT_DIR, PRODUCTS_DIR, FILE_NAME)
+        ROOT_DIR = os.environ["RESOURCES_DIR"]
+        products_path = os.path.join(ROOT_DIR, FILE_NAME)
 
-        with open(products_path) as f:
-            products = yaml.load(f, Loader=SafeLoader)
-            
-        for product_id, product_info in products.items():
+        with open(products_path) as file:
+            products = json.load(file)
 
-            for url in product_info["urls"]:
+        for product_id, product_urls in products.items():
+            for url in product_urls:
                 if self.name in url:
                     now = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-                    meta = {'product_name': product_info["name"],
+                    meta = {'product_name': product_id,
                             'retailer': self.name, 
                             'when': now,
                             'url': url}

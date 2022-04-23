@@ -10,12 +10,10 @@ from datetime import datetime
 import os
 
 timestamp = datetime.today().strftime("%Y-%m-%d-%H:%M:%S")
-FEED_URI = os.path.join(os.environ["CRAWLED_DATA_DIR"], f"crawled-{timestamp}.csv")
-# FEED_FORMAT = 'csv'
-# FEED_EXPORTERS = {'csv': 'scrapy.exporters.ItemExporter'}
-# FEED_EXPORT_ENCODING = 'utf-8'
+feed_path = os.path.join(os.environ["CRAWLED_DATA_DIR"], f"crawled-{timestamp}.csv")    
+
 FEEDS = {
-    FEED_URI: {
+    feed_path: {
         'format': 'csv',
         'item_export_kwargs': {
            'include_headers_line': False,
