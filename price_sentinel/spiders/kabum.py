@@ -11,7 +11,6 @@ class KabumSpider(BaseSpider):
 
     def parse(self, response):
         item = response.meta.get('item-meta', {})
-        item['url'] = response.url
         item['title'] = response.css('h1[itemprop="name"]::text').get()
         price = response.css('h4[itemprop="price"]::text').get()
         item['price'] = unidecode.unidecode(price)
