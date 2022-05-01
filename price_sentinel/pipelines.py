@@ -65,7 +65,7 @@ class PriceSentinelPipeline:
             VALUES (%s, %s, %s, %s, %s);
             """
         values = (item["name"], item["title"],
-                  item["price"], item["retailer"], 
+                  item["price"], item["retailer"],
                   item["timestamp"])
         self.cursor.execute(sql, values)
         self.conn.commit()
