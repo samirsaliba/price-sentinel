@@ -9,6 +9,7 @@ from itemadapter import ItemAdapter
 
 import os
 import pymysql
+import locale
 
 
 class PriceSentinelPipeline:
@@ -18,24 +19,13 @@ class PriceSentinelPipeline:
         self.USER = os.environ["USER"]
         self.PASSWORD = os.environ["PASSWORD"]
         self.PORT = os.getenv('PORT', None)
+        if self.PORT is not None:
+            self.PORT = int(self.PORT)
         self.DATABASE = os.environ["DATABASE"]
         self.TABLE = os.environ["TABLE"]
 
         self.create_connection()
         self.create_table()
-
-        pass
-
-    def check_if_table_exists(self):
-        sql = f"""
-            SELECT COUNT(*) from information_schema.`TABLES` AS t 
-            WHERE t.`TABLE_SCHEMA` = "{self.DATABASE}" 
-            AND t.table_name = "{self.TABLE}" 
-            """
-        self.cursor.execute(sql)
-        if self.cursor.fetchone()[0] == 0:
-            return False
-        return True
 
     def create_connection(self):
         self.conn = pymysql.connect(host=self.HOST,
@@ -44,22 +34,47 @@ class PriceSentinelPipeline:
                                     database=self.DATABASE,
                                     port=self.PORT)
         self.cursor = self.conn.cursor()
-        
 
     def create_table(self):
-        self.cursor.execute()
-        pass
+        self.cursor.execute(
+            f"""
+            CREATE TABLE IF NOT EXISTS {self.DATABASE}.{self.TABLE}
+            (`name` VARCHAR(50),
+            `title` VARCHAR(200),
+            `price` DECIMAL(10,2),
+            `retailer` VARCHAR(50),
+            `timestamp` DATETIME);
+            """
+        )
 
-    def process_price(value):
-        return value
+    def process_price(self, item):
+        if ("R$" in item["price"]) or (".br" in item["url"]):
+            locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+            money = item["price"].strip("R$")
 
-    def store_item_in_db(item):
-        pass
+        else:
+            locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+            money = item["price"].strip("$")
+
+        return locale.atof(money)
+
+    def store_item_in_db(self, item):
+        sql = f"""
+            INSERT INTO {self.DATABASE}.{self.TABLE}
+            (`name`, `title`, `price`, `retailer`, `timestamp`)
+            VALUES (%s, %s, %s, %s, %s);
+            """
+        values = (item["name"], item["title"],
+                  item["price"], item["retailer"], 
+                  item["timestamp"])
+        self.cursor.execute(sql, values)
+        self.conn.commit()
 
     def close_connection(self):
         self.conn.close()
 
     def process_item(self, item, spider):
-        item["price"] = self.process_price(item["price"])
+        item["price"] = self.process_price(item)
+        item["title"] = item["title"][0:200]
         self.store_item_in_db(item)
         return item

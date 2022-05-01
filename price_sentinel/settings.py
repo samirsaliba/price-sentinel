@@ -9,8 +9,11 @@
 from datetime import datetime
 import os
 
+crawled_path = os.path.join(os.environ["RESOURCES_DIR"], "crawled")
+if not os.path.exists(crawled_path):
+    os.mkdir(crawled_path)
 timestamp = datetime.today().strftime("%Y-%m-%d-%H:%M:%S")
-feed_path = os.path.join(os.environ["CRAWLED_DATA_DIR"], f"crawled-{timestamp}.csv")    
+feed_path = os.path.join(crawled_path, f"crawled-{timestamp}.csv")    
 
 FEEDS = {
     feed_path: {

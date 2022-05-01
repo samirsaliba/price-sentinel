@@ -5,8 +5,8 @@ from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
 from scrapy.utils.log import configure_logging
 
-from spiders.amazon import AmazonSpider
-from spiders.kabum import KabumSpider
+from .spiders.amazon import AmazonSpider
+from .spiders.kabum import KabumSpider
 
 
 configure_logging()
