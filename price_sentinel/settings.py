@@ -9,8 +9,11 @@
 from datetime import datetime
 import os
 
+crawled_path = os.path.join(os.environ["RESOURCES_DIR"], "crawled")
+if not os.path.exists(crawled_path):
+    os.mkdir(crawled_path)
 timestamp = datetime.today().strftime("%Y-%m-%d-%H:%M:%S")
-feed_path = os.path.join(os.environ["CRAWLED_DATA_DIR"], f"crawled-{timestamp}.csv")    
+feed_path = os.path.join(crawled_path, f"crawled-{timestamp}.csv")    
 
 FEEDS = {
     feed_path: {
@@ -77,9 +80,9 @@ COOKIES_ENABLED = False
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'price_sentinel.pipelines.PriceSentinelPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'price_sentinel.pipelines.PriceSentinelPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

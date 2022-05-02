@@ -6,7 +6,7 @@ import os
 import scrapy
 from datetime import datetime
 import json
-
+from ..items import PriceSentinelItem
 
 # Open the file and load the file
 FILE_NAME = "products.json"
@@ -23,8 +23,15 @@ class BaseSpider(scrapy.Spider):
             for url in product_urls:
                 if self.name in url:
                     now = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-                    meta = {'product_name': product_id,
+                    meta = {'name': product_id,
                             'retailer': self.name, 
-                            'when': now,
+                            'timestamp': now,
                             'url': url}
                     yield scrapy.Request(url, meta={'item-meta': meta})
+
+    def initialize_object(self, response):
+        item = PriceSentinelItem()
+        meta = response.meta.get('item-meta', {})        
+        item.update(meta)
+        return item
+
