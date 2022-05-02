@@ -4,7 +4,7 @@ Price monitor built with Scrapy: collects latest prices, checks for price drops 
 
 ## IMPORTANT:
 - Notifiers haven't been added yet, so the application collects data, stores in a database and checks for price drops. No notifying yet.
-- Only handles Amazon.com or Kabum.com.br websites. Each different website can be handled by a different spider class (see price-sentinel/spiders/)
+- Only handles Amazon.com or Kabum.com.br websites. Each different website is handled by a different spider class (see price-sentinel/spiders/), so one can add more spiders to handle other websites.
 - Handling of out-of-stock products hasn't been added, so it will probably just crash if that happens. Or maybe scrapy handles it on its own, I haven't got to that bit yet.
 
 So..
@@ -16,11 +16,10 @@ So..
 
 
 ## DATABASE:
-It also requires a mysql database running somewhere for storing the products. I'm currently running a local mysql database instance of mysql 
-(see how to do that [here](https://hevodata.com/learn/docker-mysql/)).
+The application requires a mysql database running somewhere for storing the products. I'm currently running a local mysql instance (see how to do that [here](https://hevodata.com/learn/docker-mysql/)). It also expects the database to be already created (not the table, it will create it).
 
 ## SETUP: 
-The application expects the following environmental variables to work (between quotes are examples of values):
+The application expects the following environment variables to work (between quotes are examples of values):
 - RESOURCES_DIR="/home/user/price-sentinel/resources/"
 - HOST="127.0.0.1"
 - PORT="3306"
