@@ -17,6 +17,7 @@ class TelegramNotifier():
     def __init__(self):
         self.TOKEN = os.getenv('TELEGRAM_TOKEN', None)
         self.CHAT_ID = os.getenv('TELEGRAM_CHAT_ID', None)
+        self.updater = None
 
         if self.TOKEN is not None \
                 and self.CHAT_ID is not None:
@@ -24,19 +25,20 @@ class TelegramNotifier():
                                    use_context=True)
 
     def notify(self, notifications: list):
-        if notifications:
-            text = "Hello! New price drops found: \n"
-            self.updater.bot.sendMessage(chat_id=self.CHAT_ID,
-                                        text=text)
+        if self.updater is not None:
+            if notifications:
+                text = "Hello! New price drops found: \n"
+                self.updater.bot.sendMessage(chat_id=self.CHAT_ID,
+                                            text=text)
 
-        for notification in notifications:
-            product_message = \
-                f"""Product [{notification["product_name"]}]
-                - Price: {notification["price"]},
-                - Mean of period: {notification["mean_of_period"]}
-                - Minimum recorded: {notification["historic_min"]}
-                - Retailers with this price: {notification["historic_min"]}
-                """
-            self.updater.bot.sendMessage(chat_id=self.CHAT_ID,
-                                         text=product_message)
-        self.updater.stop()
+            for notification in notifications:
+                product_message = \
+                    f"""Product [{notification["product_name"]}]
+                    - Price: {notification["price"]},
+                    - Mean of period: {notification["mean_of_period"]}
+                    - Minimum recorded: {notification["historic_min"]}
+                    - Retailers with this price: {notification["historic_min"]}
+                    """
+                self.updater.bot.sendMessage(chat_id=self.CHAT_ID,
+                                            text=product_message)
+            self.updater.stop()
