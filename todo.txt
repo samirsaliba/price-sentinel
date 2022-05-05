@@ -1,3 +1,5 @@
-- Add notifiers
+- Add Email notifier
 - Add Dockerfile, docker-compose
 - Fix warnings (scrapy, pandas)
+- Add objective price (ie bound to notify)
+- Add url to notification

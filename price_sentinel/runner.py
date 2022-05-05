@@ -10,11 +10,15 @@ from scrapy.utils.log import configure_logging
 from .spiders.amazon import AmazonSpider
 from .spiders.kabum import KabumSpider
 
+from .notifiers.telegram_bot import TelegramNotifier
+
 import pymysql
 import pandas as pd
 
 PRICE_INTERVAL = 90  # in days
 DROP_FROM_MEAN_THRESHOLD = 0.9
+
+NOTIFIERS = [TelegramNotifier]
 
 
 class PriceSentinel():
@@ -25,6 +29,7 @@ class PriceSentinel():
         self.DATABASE = os.environ["DATABASE"]
         self.TABLE = os.environ["TABLE"]
         self.PORT = os.getenv('PORT', None)
+        self.notifications = []
         if self.PORT is not None:
             self.PORT = int(self.PORT)
 
@@ -80,21 +85,25 @@ class PriceSentinel():
             FROM {self.DATABASE}.{self.TABLE} 
         )
         """
-        last_values_df = pd.read_sql(sql=last_values_sql,
-                                     con=self.conn,
-                                     parse_dates=["timestamp"])
-        last_values_df["day"] = last_values_df["timestamp"].dt.date
-        last_min = last_values_df["price"].min()
+        df = pd.read_sql(sql=last_values_sql,
+                         con=self.conn,
+                         parse_dates=["timestamp"])
+        df["day"] = df["timestamp"].dt.date
+        last_min = df["price"].min()
+
+        retailers = df[df["price"]==last_min]["retailer"].values
 
         if (last_min < historic_min)\
                 or (last_min < DROP_FROM_MEAN_THRESHOLD * min_mean):
-            # TODO notify here
-            print(f"""Notificaton:\n\
-            - Product {product_name}\ 
-            \tCurrent price {last_min}\
-            \tMean of period {min_mean}\
-            \tHistoric min {historic_min}\
-            """)
+
+            notification = {
+                "product": product_name,
+                "price": last_min,
+                "mean_of_period": min_mean,
+                "historic_min": historic_min,
+                "retailers": retailers
+            }
+            self.notifications.append(notification)
 
     def check_price_drop(self):
         products_names_df = pd.read_sql(
@@ -111,8 +120,14 @@ class PriceSentinel():
         for prod_name in products_names:
             self.check_price_drop_item(prod_name)
 
+    def notify(self):
+        for Notifier in NOTIFIERS:
+            notifier_object = Notifier()
+            notifier_object.notify(self.notifications)
+
 
 if __name__ == '__main__':
     price_sentinel = PriceSentinel()
     price_sentinel.scrape()
     price_sentinel.check_price_drop()
+    price_sentinel.notify()
