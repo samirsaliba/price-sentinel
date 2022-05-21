@@ -15,14 +15,14 @@ import locale
 class PriceSentinelPipeline:
 
     def __init__(self) -> None:
-        self.HOST = os.environ["HOST"]
-        self.USER = os.environ["USER"]
-        self.PASSWORD = os.environ["PASSWORD"]
-        self.PORT = os.getenv('PORT', None)
+        self.HOST = os.environ["DB_HOST"]
+        self.USER = os.environ["DB_USER"]
+        self.PASSWORD = os.environ["DB_PASSWORD"]
+        self.PORT = os.getenv('DB_PORT', None)
         if self.PORT is not None:
             self.PORT = int(self.PORT)
-        self.DATABASE = os.environ["DATABASE"]
-        self.TABLE = os.environ["TABLE"]
+        self.DATABASE = os.environ["DB_DATABASE"]
+        self.TABLE = os.environ["DB_TABLE"]
 
         self.create_connection()
         self.create_table()

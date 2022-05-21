@@ -1,24 +1,22 @@
+from .notifiers.telegram_bot import TelegramNotifier
+from .notifiers.email import EmailNotifier
 import os
-
+import pandas as pd
+import pymysql
 import scrapy
-from twisted.internet import reactor
-
 from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
 from scrapy.utils.log import configure_logging
-
 from .spiders.amazon import AmazonSpider
 from .spiders.kabum import KabumSpider
 
-from .notifiers.telegram_bot import TelegramNotifier
+from twisted.internet import reactor
 
-import pymysql
-import pandas as pd
 
 PRICE_INTERVAL = 90  # in days
 DROP_FROM_MEAN_THRESHOLD = 0.9
 
-NOTIFIERS = [TelegramNotifier]
+NOTIFIERS = [EmailNotifier, TelegramNotifier]
 
 
 class PriceSentinel():
@@ -91,7 +89,7 @@ class PriceSentinel():
         df["day"] = df["timestamp"].dt.date
         last_min = df["price"].min()
 
-        retailers = df[df["price"]==last_min]["retailer"].values
+        retailers = df[df["price"] == last_min]["retailer"].values
 
         if (last_min < historic_min)\
                 or (last_min < DROP_FROM_MEAN_THRESHOLD * min_mean):

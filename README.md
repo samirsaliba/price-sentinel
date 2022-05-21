@@ -21,12 +21,27 @@ The application requires a mysql database running somewhere for storing the prod
 ## SETUP: 
 The application expects the following environment variables to work (between quotes are examples of values):
 - RESOURCES_DIR="/home/user/price-sentinel/resources/"
-- HOST="127.0.0.1"
-- PORT="3306"
-- USER="user"
-- PASSWORD="password"
-- DATABASE="price_sentinel"
-- TABLE="products_prices"
+- DB_HOST="127.0.0.1"
+- DB_PORT="3306"
+- DB_USER="user"
+- DB_PASSWORD="password"
+- DB_DATABASE="price_sentinel"
+- DB_TABLE="products_prices"
+
+For the Telegram Notifier, please refer to the Telegram documentation on how to create 
+your own Telegram Bot [here](https://core.telegram.org/bots#6-botfather). Then, refer to the script utils/telegram_get_chat_id.py to get your telegram chat_id (so the Bot can find you). Finally, set tthe following envinroment variables:
+- TELEGRAM_TOKEN="your-bot-token"
+- TELEGRAM_CHAT_ID="your-chat-id"
+
+For the Email Notifier, the following variables must be set (between quotes are also examples):
+- EMAIL_SMTP="smtp.gmail.com"
+- EMAIL_FROM="bot@gmail.com"
+- EMAIL_USER="bot@gmail.com"
+- EMAIL_TO="user@gmail.com"
+- EMAIL_PORT="587"
+- EMAIL_PASSWORD="password"
+
+PS. For Gmail, you should create an App Password -- normal user password won't work. Please refer to [this article](https://support.google.com/accounts/answer/185833?hl=en) from Google on how to do that.
 
 Install the requirements with pip (highly recommend that you do that in a virtual environment - venv) with
 - pip install -r requirements.txt
